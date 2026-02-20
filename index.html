@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HydroBlock GreenLoop - Smart Recycled Water Network</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+        
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --emerald: #10B981;
+            --emerald-dark: #059669;
+            --emerald-light: #ECFDF5;
+            --gray-900: #111827;
+            --gray-700: #374151;
+            --gray-600: #4B5563;
+            --gray-400: #9CA3AF;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--gray-900);
+            background: #FFFFFF;
+            overflow-x: hidden;
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+        }
+
+        /* ─── Scroll-reveal base state ─── */
+        .reveal {
+            opacity: 0;
+            transform: translateY(36px);
+            transition: opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1),
+                        transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .reveal.from-left  { transform: translateX(-48px); }
+        .reveal.from-right { transform: translateX(48px); }
+        .reveal.visible {
+            opacity: 1;
+            transform: translate(0, 0);
+        }
+        .reveal-delay-1 { transition-delay: 0.1s; }
+        .reveal-delay-2 { transition-delay: 0.2s; }
+        .reveal-delay-3 { transition-delay: 0.35s; }
+        
+        /* ─── Floating BG shapes ─── */
+        .floating-shapes {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .shape {
+            position: absolute;
+            opacity: 0.07;
+            border-radius: 50%;
+        }
+        .shape-1 {
+            width: 520px; height: 520px;
+            background: var(--emerald);
+            top: 5%; right: -8%;
+            animation: float 9s ease-in-out infinite;
+        }
+        .shape-2 {
+            width: 360px; height: 360px;
+            background: var(--emerald-dark);
+            bottom: 5%; left: -6%;
+            animation: float 12s ease-in-out infinite 1.5s;
+        }
+        .shape-3 {
+            width: 220px; height: 220px;
+            background: var(--emerald);
+            top: 50%; left: 48%;
+            animation: float 15s ease-in-out infinite 3s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50%       { transform: translateY(-22px); }
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(16,185,129,0.4); }
+            50%       { box-shadow: 0 0 44px rgba(16,185,129,0.75); }
+        }
+
+        /* ─── Gradient backgrounds ─── */
+        .gradient-mint {
+            background: linear-gradient(135deg, #FFFFFF 0%, #ECFDF5 100%);
+        }
+
+        /* ─── Navbar ─── */
+        .navbar {
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            box-shadow: 0 1px 0 rgba(16,185,129,0.12);
+            transition: box-shadow 0.3s ease;
+        }
+        .navbar.scrolled {
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+        }
+        .nav-link {
+            position: relative;
+            color: var(--gray-700);
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -3px; left: 0;
+            width: 0; height: 2px;
+            background: var(--emerald);
+            border-radius: 2px;
+            transition: width 0.25s ease;
+        }
+        .nav-link:hover { color: var(--emerald); }
+        .nav-link:hover::after { width: 100%; }
+
+        /* ─── CTA Button ─── */
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--emerald);
+            color: #fff;
+            padding: 13px 34px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 15px;
+            letter-spacing: 0.01em;
+            cursor: pointer;
+            border: none;
+            transition: background 0.25s, transform 0.25s, box-shadow 0.25s;
+        }
+        .btn-primary:hover {
+            background: var(--emerald-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 28px rgba(16,185,129,0.35);
+        }
+        .btn-primary:active { transform: translateY(-1px); }
+
+        /* ─── Hero badge ─── */
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(16,185,129,0.1);
+            border: 1px solid rgba(16,185,129,0.25);
+            color: var(--emerald-dark);
+            padding: 6px 16px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            margin-bottom: 24px;
+        }
+        .hero-badge span.dot {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: var(--emerald);
+            display: inline-block;
+            animation: pulse-dot 1.8s ease-in-out infinite;
+        }
+        @keyframes pulse-dot {
+            0%,100% { opacity: 1; transform: scale(1); }
+            50%      { opacity: 0.5; transform: scale(1.4); }
+        }
+
+        /* ─── Stat pills ─── */
+        .stat-pill {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            border: 1px solid rgba(16,185,129,0.2);
+            border-radius: 12px;
+            padding: 12px 20px;
+            box-shadow: 0 2px 12px rgba(16,185,129,0.08);
+            transition: transform 0.25s, box-shadow 0.25s;
+        }
+        .stat-pill:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(16,185,129,0.15);
+        }
+        .stat-pill .icon {
+            width: 38px; height: 38px;
+            background: var(--emerald-light);
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+            color: var(--emerald);
+            flex-shrink: 0;
+        }
+
+        /* ─── Tech cards ─── */
+        .tech-card {
+            background: white;
+            border: 1.5px solid #E5F5EE;
+            border-radius: 16px;
+            padding: 36px 28px;
+            transition: border-color 0.3s, transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .tech-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, transparent 60%, rgba(16,185,129,0.04) 100%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .tech-card:hover::before { opacity: 1; }
+        .tech-card:hover {
+            border-color: var(--emerald);
+            transform: translateY(-12px);
+            box-shadow: 0 24px 48px rgba(16,185,129,0.15);
+        }
+        .tech-card .card-image-wrapper {
+            height: 100px;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 20px;
+        }
+        .tech-card .card-img {
+            max-height: 100%;
+            max-width: 110px;
+            object-fit: contain;
+            transition: transform 0.4s ease;
+        }
+        .tech-card:hover .card-img { transform: scale(1.08); }
+
+        /* Pulse glow on middle card */
+        .pulse-glow { animation: pulse-glow 2.2s ease-in-out infinite; }
+
+        /* ─── Section ─── */
+        .section { scroll-margin-top: 80px; }
+
+        /* ─── Concept section ─── */
+        .concept-blob {
+            position: absolute;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(16,185,129,0.12) 0%, transparent 70%);
+            border-radius: 50%;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        /* ─── Divider wave ─── */
+        .wave-divider svg { display: block; }
+
+        /* ─── Footer ─── */
+        footer a { transition: color 0.2s; }
+        .social-icon {
+            width: 38px; height: 38px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.08);
+            display: inline-flex; align-items: center; justify-content: center;
+            transition: background 0.2s, color 0.2s, transform 0.2s;
+            color: var(--gray-400);
+        }
+        .social-icon:hover {
+            background: var(--emerald);
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        /* ─── Scrollbar ─── */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: rgba(16,185,129,0.5); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--emerald); }
+
+        /* ─── Selection ─── */
+        ::selection { background: rgba(16,185,129,0.2); color: inherit; }
+    </style>
+</head>
+<body>
+
+    <!-- Floating Background Shapes -->
+    <div class="floating-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+    </div>
+    
+    <div style="position:relative;z-index:1;">
+
+        <!-- ══════════════════════════ NAVBAR ══════════════════════════ -->
+        <nav class="navbar sticky top-0 z-50" id="navbar">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-20">
+                    <div class="flex items-center">
+                        <img src="emsilogo.png" alt="Logo EMSI" class="h-12 w-auto">
+                    </div>
+                    
+                    <div class="hidden md:flex gap-8">
+                        <a href="#home"       class="nav-link">Home</a>
+                        <a href="#concept"    class="nav-link">How it Works</a>
+                        <a href="#technology" class="nav-link">Technology</a>
+                    </div>
+                    
+                    <div class="hidden lg:flex items-center gap-6">
+                        <img src="https://res.cloudinary.com/dt0ipiztn/image/upload/v1761864256/innov.team.logo_1_xbiydn.png"  alt="Innov Team" class="h-10 w-auto opacity-80 hover:opacity-100 transition">
+                        <img src="https://res.cloudinary.com/dt0ipiztn/image/upload/v1761915476/logosmartilab_zp0rb1.webp" alt="SmartiLab"  class="h-10 w-auto opacity-80 hover:opacity-100 transition">
+                    </div>
+                    
+                    <button class="md:hidden text-gray-700 p-2 rounded-lg hover:bg-gray-100 transition" id="mobile-menu-btn" aria-label="Toggle menu">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+                
+                <div id="mobile-menu" class="hidden md:hidden pb-5 pt-2 border-t border-gray-100 space-y-1">
+                    <a href="#home"       class="block py-2 px-3 rounded-lg text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 transition font-medium">Home</a>
+                    <a href="#concept"    class="block py-2 px-3 rounded-lg text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 transition font-medium">How it Works</a>
+                    <a href="#technology" class="block py-2 px-3 rounded-lg text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 transition font-medium">Technology</a>
+                </div>
+            </div>
+        </nav>
+        
+        <!-- ══════════════════════════ HERO ══════════════════════════ -->
+        <section id="home" class="section gradient-mint min-h-screen flex items-center">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full py-20">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+
+                    <!-- Left -->
+                    <div class="reveal from-left">
+                        <div class="hero-badge">
+                            <span class="dot"></span>
+                            Smart Water Technology
+                        </div>
+                        <h1 class="text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight" style="letter-spacing:-0.02em;">
+                            Hydro<span style="color:#10B981;">Block</span>
+                        </h1>
+                        <p class="text-xl text-gray-700 mb-5 leading-relaxed font-medium">
+                            Smart Recycled Water Network for Sustainable Neighborhoods.
+                        </p>
+                        <p class="text-lg text-gray-500 mb-10 leading-relaxed">
+                            Transform your community into a self-sustaining water ecosystem. Recycle, share, and save potable water while earning rewards.
+                        </p>
+
+                        <!-- Stat Pills -->
+                        <div class="flex flex-wrap gap-4">
+                            <div class="stat-pill reveal reveal-delay-1">
+                                <div class="icon"><i class="fas fa-tint"></i></div>
+                                <div>
+                                    <div class="text-lg font-bold text-gray-900" style="line-height:1.2;">40%</div>
+                                    <div class="text-xs text-gray-500">Water Saved</div>
+                                </div>
+                            </div>
+                            <div class="stat-pill reveal reveal-delay-2">
+                                <div class="icon"><i class="fas fa-home"></i></div>
+                                <div>
+                                    <div class="text-lg font-bold text-gray-900" style="line-height:1.2;">100+</div>
+                                    <div class="text-xs text-gray-500">Homes Connected</div>
+                                </div>
+                            </div>
+                            <div class="stat-pill reveal reveal-delay-3">
+                                <div class="icon"><i class="fas fa-leaf"></i></div>
+                                <div>
+                                    <div class="text-lg font-bold text-gray-900" style="line-height:1.2;">Zero</div>
+                                    <div class="text-xs text-gray-500">Waste Goal</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Right visual -->
+                    <div class="reveal from-right flex items-center justify-center">
+                        <div class="relative w-full max-w-lg">
+                            <!-- Soft glow ring -->
+                            <div style="position:absolute;inset:-20px;background:radial-gradient(circle,rgba(16,185,129,0.12) 0%,transparent 70%);border-radius:50%;pointer-events:none;"></div>
+                            <img src="house.png" alt="HydroBlock Smart House" class="w-full h-full object-contain rounded-2xl relative" style="filter:drop-shadow(0 20px 40px rgba(16,185,129,0.15));">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Wave divider -->
+        <div class="wave-divider" style="margin-top:-2px;line-height:0;">
+            <svg viewBox="0 0 1440 60" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" style="width:100%;height:60px;">
+                <path d="M0,30 C360,60 1080,0 1440,30 L1440,60 L0,60 Z" fill="#f0fdf4"/>
+            </svg>
+        </div>
+        
+        <!-- ══════════════════════════ CONCEPT ══════════════════════════ -->
+        <section id="concept" class="section relative w-full min-h-screen flex items-center overflow-hidden py-20" style="background:linear-gradient(135deg,#fff 0%,#f0fdf4 100%);">
+            <div class="concept-blob"></div>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                    
+                    <!-- Image -->
+                    <div class="reveal from-left flex items-center justify-center">
+                        <div class="relative">
+                            <div style="position:absolute;inset:-24px;background:rgba(16,185,129,0.08);border-radius:40% 60% 55% 45% / 45% 55% 60% 40%;animation:float 8s ease-in-out infinite;pointer-events:none;"></div>
+                            <img src="irrigation.png" 
+                                 alt="HydroBlock Sustainable Irrigation" 
+                                 class="relative w-full h-auto object-cover"
+                                 style="border-radius:24px;transition:transform 0.7s cubic-bezier(0.22,1,0.36,1);filter:drop-shadow(0 16px 32px rgba(16,185,129,0.18));"
+                                 onmouseover="this.style.transform='scale(1.04)'"
+                                 onmouseout="this.style.transform='scale(1)'">
+                        </div>
+                    </div>
+                    
+                    <!-- Text -->
+                    <div class="reveal from-right">
+                        <!-- Section label -->
+                        <div class="hero-badge" style="margin-bottom:20px;">
+                            <i class="fas fa-recycle" style="font-size:11px;"></i>
+                            Our Approach
+                        </div>
+                        <h2 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-6 leading-tight" style="letter-spacing:-0.02em;">
+                            Hydro<span style="color:#10B981;">Block's</span> Concept
+                        </h2>
+                        <div class="space-y-5 text-gray-600">
+                            <p class="text-lg leading-relaxed">
+                                HydroBlock transforms buildings and neighborhoods into 
+                                <span class="font-semibold" style="color:#10B981;">smart recycled water sharing networks</span>. 
+                                We capture greywater (showers, sinks, laundry), filter it, and store it locally.
+                            </p>
+                            <p class="text-lg leading-relaxed">
+                                This creates a <span class="font-semibold" style="color:#10B981;">collective resource</span> 
+                                distributed via a blockchain-inspired cooperative network — saving potable water for what truly matters.
+                            </p>
+                        </div>
+
+                        <!-- Mini feature list -->
+                        <div class="mt-8 space-y-3">
+                            <div class="flex items-center gap-3 text-gray-700 font-medium">
+                                <span style="width:22px;height:22px;background:#10B981;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                    <i class="fas fa-check" style="color:white;font-size:10px;"></i>
+                                </span>
+                                Greywater capture &amp; multi-stage filtration
+                            </div>
+                            <div class="flex items-center gap-3 text-gray-700 font-medium">
+                                <span style="width:22px;height:22px;background:#10B981;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                    <i class="fas fa-check" style="color:white;font-size:10px;"></i>
+                                </span>
+                                Real-time IoT monitoring per household
+                            </div>
+                            <div class="flex items-center gap-3 text-gray-700 font-medium">
+                                <span style="width:22px;height:22px;background:#10B981;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                    <i class="fas fa-check" style="color:white;font-size:10px;"></i>
+                                </span>
+                                Blockchain-secured water credits &amp; rewards
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Wave divider reversed -->
+        <div class="wave-divider" style="margin-bottom:-2px;line-height:0;transform:scaleY(-1);">
+            <svg viewBox="0 0 1440 60" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" style="width:100%;height:60px;">
+                <path d="M0,30 C360,60 1080,0 1440,30 L1440,60 L0,60 Z" fill="#f0fdf4"/>
+            </svg>
+        </div>
+
+        <!-- ══════════════════════════ TECHNOLOGY ══════════════════════════ -->
+        <section id="technology" class="section gradient-mint py-24">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16 reveal">
+                    <div class="hero-badge" style="display:inline-flex;margin-bottom:16px;">
+                        <i class="fas fa-microchip" style="font-size:11px;"></i>
+                        Powered By
+                    </div>
+                    <h2 class="text-4xl font-bold text-gray-900 mb-4" style="letter-spacing:-0.02em;">The Technology</h2>
+                    <p class="text-xl text-gray-500 max-w-xl mx-auto">Innovative solutions powering sustainable water management</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="tech-card reveal reveal-delay-1">
+                        <div class="card-image-wrapper">
+                            <img src="iot.png" alt="IoT & Smart Metering" class="card-img">
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-3">IoT &amp; Smart Metering</h3>
+                        <p class="text-gray-500 leading-relaxed text-sm">
+                            Every home has a smart meter measuring recycling contributions in real-time. Track your water usage instantly with precision.
+                        </p>
+                    </div>
+                    
+                    <div class="tech-card reveal reveal-delay-2 pulse-glow">
+                        <div class="card-image-wrapper">
+                            <img src="blockchain.png" alt="Blockchain Ledger" class="card-img">
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-3">Blockchain Ledger</h3>
+                        <p class="text-gray-500 leading-relaxed text-sm">
+                            A transparent, decentralized ledger that tracks water credits and rewards, ensuring secure peer-to-peer exchange.
+                        </p>
+                    </div>
+                    
+                    <div class="tech-card reveal reveal-delay-3">
+                        <div class="card-image-wrapper">
+                            <img src="ai.png" alt="AI & Machine Learning" class="card-img">
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-3">AI &amp; Machine Learning</h3>
+                        <p class="text-gray-500 leading-relaxed text-sm">
+                            An autonomous irrigation system powered by solar energy. AI optimizes water usage for parks and gardens based on weather data and soil needs.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+      <!-- ══════════════════════════ FOOTER ══════════════════════════ -->
+<footer style="background:#0f172a;color:#e2e8f0;" class="py-14">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-10 mb-10">
+            <div>
+                <h3 class="text-lg font-bold mb-3" style="color:white;">HydroBlock</h3>
+                <p style="color:#94a3b8;font-size:14px;line-height:1.7;">Smart Recycled Water Network for Sustainable Neighborhoods. Building a greener future, one block at a time.</p>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold mb-4" style="color:white;">Quick Links</h3>
+                <ul class="space-y-2" style="font-size:14px;">
+                    <li><a href="#home"       style="color:#94a3b8;" class="hover:text-emerald-400 transition">Home</a></li>
+                    <li><a href="#concept"    style="color:#94a3b8;" class="hover:text-emerald-400 transition">Concept</a></li>
+                    <li><a href="#technology" style="color:#94a3b8;" class="hover:text-emerald-400 transition">Technology</a></li>
+                </ul>
+            </div>
+
+            <!-- ✅ UPDATED: Contact / Credentials -->
+            <div>
+                <h3 class="text-lg font-bold mb-4" style="color:white;">Contact</h3>
+                <ul class="space-y-3" style="font-size:14px;">
+                    <li style="display:flex;align-items:flex-start;gap:10px;">
+                        <i class="fas fa-map-marker-alt" style="color:#34d399;margin-top:3px;min-width:14px;"></i>
+                        <span style="color:#94a3b8;line-height:1.6;">Club Innovation S/C SMARTiLab - EMSI
+Rabat 10000, Maroc</span>
+                    </li>
+                    <li style="display:flex;align-items:center;gap:10px;">
+                        <i class="fas fa-envelope" style="color:#34d399;min-width:14px;"></i>
+                        <a href="mailto:contact@hydroblock.dz" style="color:#94a3b8;" class="hover:text-emerald-400 transition">innovclub.rabat@emsi-edu.ma</a>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+        <div style="border-top:1px solid rgba(255,255,255,0.08);padding-top:28px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;">
+            <p style="color:#64748b;font-size:13px;">© 2026 HydroBlock. All rights reserved. Made by Nmar Yassir</p>
+        </div>
+    </div>
+</footer>
+
+    </div><!-- /content -->
+    
+    <script>
+        // ─── Mobile Menu ───
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu    = document.getElementById('mobile-menu');
+        mobileMenuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+        mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => mobileMenu.classList.add('hidden')));
+
+        // ─── Navbar scroll class ───
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            navbar.classList.toggle('scrolled', window.scrollY > 40);
+        }, { passive: true });
+
+        // ─── Universal scroll-reveal ───
+        const revealEls = document.querySelectorAll('.reveal');
+        const io = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.classList.add('visible');
+                    io.unobserve(e.target);
+                }
+            });
+        }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+        revealEls.forEach(el => io.observe(el));
+
+        // ─── GSAP floating shapes ───
+        gsap.to('.shape-1', { y: -28, duration: 9,  repeat: -1, yoyo: true, ease: 'sine.inOut' });
+        gsap.to('.shape-2', { y:  22, duration: 12, repeat: -1, yoyo: true, ease: 'sine.inOut', delay: 1.5 });
+        gsap.to('.shape-3', { y: -16, duration: 15, repeat: -1, yoyo: true, ease: 'sine.inOut', delay: 3 });
+
+        // ─── Smooth hash scroll ───
+        document.querySelectorAll('a[href^="#"]').forEach(a => {
+            a.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+    </script>
+</body>
+</html>
